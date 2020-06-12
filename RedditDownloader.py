@@ -53,13 +53,16 @@ if __name__ == "__main__":
 	subred = input("# Enter a subreddit, I for import (from subreddit_list.py), multiple searches delimited by a comma (,) or leave blank for all: ")
 	if ',' in subred:
 		subred = subred.split(',')
+		subred = subred.strip()
 	if subred == "I":
 		from subreddit_list import subreddits
 		subred = subreddits.split(',')
+		subred = subred.strip()
 	# Search keyword.
 	search_list = input("# Enter a search, multiple searches delimited by a comma (,) or leave blank: ")
 	if search_list != '':
 		search_list = search_list.split(',')
+		search_list = search_list.strip()
 
 	# Print out searchlist
 	print(search_list)
