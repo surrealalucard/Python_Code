@@ -13,22 +13,34 @@ def redditSearch(search_list,subreddit):
 		# Option 1 just gets new 25.
 		print("+ Option 1")
 		for sub in subreddit:
+			sub = sub.strip()
 			print(sub)
-			for submission in reddit.subreddit(sub).new(limit=25):
-				downloadVid(submission.url)
+			for submission in reddit.subreddit(sub).new(limit=100):
+				downloadVid(submission.url, sub)
 	else:
 		# Option 2 searches with your actual keyword
 		print("+ Option 2")
 		for search in search_list:
-			for sub in subreddit:
-				print(sub)
-				for submission in reddit.subreddit(sub).search(search.lower()):
-					downloadVid(submission.url)
+			if isinstance(subreddit, str):
+				search = search.strip()
+				subreddit = subreddit.strip()
+				print(subreddit)
+				for submission in reddit.subreddit(subreddit).search(search.lower()):
+					downloadVid(submission.url, search + '-' + subreddit)
+			if isinstance(subreddit, list):
+				for sub in subreddit:
+					search = search.strip()
+					sub = sub.strip()
+					print(sub)
+					for submission in reddit.subreddit(sub).search(search.lower()):
+						downloadVid(submission.url, search + '-' + sub)
+
 
 # Downloads videos with youtube_dl library.
-def downloadVid(url):
+def downloadVid(url, file_loc):
+	ydl_opts = {'outtmpl': './' + file_loc + '/%(title)s.%(ext)s'}
 	try:
-		with youtube_dl.YoutubeDL() as ydl:
+		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			ydl.download([url, ])
 		print("+ Video Downloaded from {}".format(url))
 	except Exception as exc:
@@ -53,24 +65,16 @@ if __name__ == "__main__":
 	subred = input("# Enter a subreddit, I for import (from subreddit_list.py), multiple searches delimited by a comma (,) or leave blank for all: ")
 	if ',' in subred:
 		subred = subred.split(',')
-		subred = subred.strip()
 	if subred == "I":
 		from subreddit_list import subreddits
 		subred = subreddits.split(',')
-		subred = subred.strip()
 	# Search keyword.
 	search_list = input("# Enter a search, multiple searches delimited by a comma (,) or leave blank: ")
 	if search_list != '':
 		search_list = search_list.split(',')
-		search_list = search_list.strip()
 
 	# Print out searchlist
 	print(search_list)
 
 	# Returns a list of urls, and how many.
 	redditSearch(search_list,subred)
-
-	# If no urls were found.
-	if not url_list:
-		print("! Nothing Found. Exiting. !")
-		exit()
